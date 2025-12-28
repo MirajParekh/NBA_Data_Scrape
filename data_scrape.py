@@ -1,6 +1,28 @@
 from bs4 import BeautifulSoup
 import requests
+import pandas as pd
 
 url = 'https://www.basketball-reference.com/leagues/NBA_stats_per_game.html'
 page = requests.get(url)
-print(page)
+
+# cleaning up data to get only the table
+soup = BeautifulSoup(page.text, 'html.parser')
+col_titles = soup.find_all('tr')[1]
+titles = col_titles.find_all('th')
+titles_table = [title.text for title in titles]
+
+# insert html data into df
+df = pd.DataFrame(columns=titles_table[1:]) #dont need index col 
+
+all_row_data = soup.find('tbody')
+rows = all_row_data.find_all('tr')
+rows = rows[:20] #since after 20th index, html goes to another table we dont care abt
+
+for row in rows:
+    individual_row_stats = row.find_all('td')
+    individual_row_stats = [stat.text for stat in individual_row_stats]
+    
+    length = len(df)
+    df.loc[length] = individual_row_stats
+
+
