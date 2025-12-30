@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
 
 url = 'https://www.basketball-reference.com/leagues/NBA_stats_per_game.html'
 page = requests.get(url)
@@ -25,4 +26,17 @@ for row in rows:
     length = len(df)
     df.loc[length] = individual_row_stats
 
+df.index = df.get('Season')
+df.pop('Season')
+    
+# print(df.head())
+# df_3pt = df.get(['3P', '3PA', '3P%'])
 
+df_3pt = df.get('3P')
+
+# fix problem where cant plot bcus data in the form of str
+for i in range(len(df_3pt)):
+    df_3pt[i] = float(df_3pt[i])
+
+plot = df_3pt.plot()
+plt.show()
